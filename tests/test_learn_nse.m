@@ -23,7 +23,15 @@ for t = 1:T
 end
 
 [errs_nse, net_nse] = learn_nse(net, data_train, labels_train, data_test, ...
-  labels_test);
+   labels_test);
+
+
+model.type = 'CART';
+net.a = .5;
+net.b = 10;
+net.threshold = 0.01; 
+net.mclass = 2;
+net.base_classifier = model;
 
 smote_params.minority_class = 2;
 smote_params.k = 3;
@@ -34,6 +42,3 @@ smote_params.N = 200;
 figure;
 plot(errs_nse)
 plot(errs_cds,'r')
-
-net_nse
-net_cds
