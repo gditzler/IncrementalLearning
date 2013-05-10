@@ -181,10 +181,8 @@ for ell = 1:n_timestamps
   [predictions,posterior] = classify_ensemble(net, data_test_t, labels_test_t);
   errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
   
-  disp(net.t)
   net.initialized = 1;
   net.t = net.t + 1;
-
 
 end
 
