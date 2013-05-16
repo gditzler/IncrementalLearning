@@ -1,0 +1,1 @@
+function [fm,r,p,er] = stats(f, h)
