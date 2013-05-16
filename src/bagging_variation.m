@@ -18,10 +18,7 @@ function sub_ensemble = bagging_variation(data, labels, n_classifiers, minority_
 %   Learn++.NIE. 
 % 
 %   Cite: 
-%   1) Elwell R. and Polikar R., "Incremental Learning of Concept Drift 
-%      in Nonstationary Environments" IEEE Transactions on Neural Networks, 
-%      vol. 22, no. 10, pp. 1517-1531
-%   2) G. Ditzler and R. Polikar, "Incremental learning of concept drift 
+%   1) G. Ditzler and R. Polikar, "Incremental learning of concept drift 
 %      from streaming imbalanced data," in IEEE Transactions on Knowledge 
 %      & Data Engineering, 2012, accepted.
 % 
@@ -50,7 +47,8 @@ positive_indices = find(labels == minority_class);
 sub_ensemble = cell(n_classifiers, 1);
 
 for k = 1:n_classifiers
-  index = negative_indices(randi(numel(negative_indices), 1, floor(numel(negative_indices)/n_classifiers)));
+  index = negative_indices(randi(numel(negative_indices), 1, ...
+    floor(numel(negative_indices)/n_classifiers)));
   data_k = [data(index, :); data(positive_indices, :)];
   label_k = [labels(index); labels(positive_indices)];
   sub_ensemble{k} = classifier_train(base_classifier, data_k, label_k);
