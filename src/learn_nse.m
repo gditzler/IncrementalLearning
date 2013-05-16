@@ -23,7 +23,7 @@ function [errs, net] = learn_nse(net, data_train, labels_train, data_test, ...
 %         smote_params.k - see SMOTE.m
 %         smote_params.N - see SMOTE.m
 %   
-%   Implementation of Learn++.NSE and Learn++.NSE. If @smote_params 
+%   Implementation of Learn++.NSE and Learn++.CDS. If @smote_params 
 %   is specified then the implementation is Learn++.CDS
 %   
 %   Cite: 
