@@ -1,1 +1,1 @@
-function [fm,r,p,er] = stats(f, h)
+function [f_measure,g_mean,recall,precision,err] = stats(f, h)

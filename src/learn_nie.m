@@ -1,5 +1,7 @@
-function learn_nie()
+function learn_nie(net, data_train, labels_train, data_test, labels_test)
 % implement learn++.nie
+net.method = 'wavg';% wavg, fm, gm
+
 
 disp('I just wrote this up. I have not fully tested it. So')
 disp('use it at your own risk. Let me know of you catch any')
@@ -15,9 +17,3 @@ net.classifierweigths = {};      % array of classifier weights
 errs = zeros(n_timestamps, 1);
 
 
-
-
-function bagging_variation(data, labels)
-
-
-function [fm,r,p,er] = stats(f, h)
