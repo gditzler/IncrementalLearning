@@ -5,27 +5,34 @@ disp('The ConceptDriftData.m file must be in the Matlab path. This');
 disp('file can be found: https://github.com/gditzler/ConceptDriftData ');
 addpath('../src/');
 
-model.type = 'CART';
-net.a = .5;
-net.b = 10;
-net.threshold = 0.01; 
-net.mclass = 2;
-net.base_classifier = model;
+model.type = 'CART';          % base classifier
+net.a = .5;                   % slope parameter to a sigmoid
+net.b = 10;                   % cutoff parameter to a sigmoid
+net.threshold = 0.01;         % how small is too small for error
+net.mclass = 2;               % number of classes in the prediciton problem
+net.base_classifier = model;  % set the base classifier in the net struct
 
-T = 200;
-N = 100;
+% generate the sea data set
+T = 200;  % number of time stamps
+N = 100;  % number of data points at each time
 [data_train, labels_train,data_test,labels_test] = ConceptDriftData('sea', T, N);
 for t = 1:T
+  % i wrote the code along time ago and i used at assume column vectors for
+  % data and i wrote all the code for learn++ on github to assume row
+  % vectors. the primary reasoning for this is that the stats toolbox in
+  % matlab uses row vectors for operations like mean, cov and the
+  % classifiers like CART and NB
   data_train{t} = data_train{t}';
   labels_train{t} = labels_train{t}';
   data_test{t} = data_test{t}';
   labels_test{t} = labels_test{t}';
 end
 
+% run learn++.nse
 [errs_nse, net_nse] = learn_nse(net, data_train, labels_train, data_test, ...
    labels_test);
 
-
+% reset the parameters of the net struct. 
 model.type = 'CART';
 net.a = .5;
 net.b = 10;
@@ -33,9 +40,13 @@ net.threshold = 0.01;
 net.mclass = 2;
 net.base_classifier = model;
 
+% set the parameters for smote
 smote_params.minority_class = 2;
 smote_params.k = 3;
 smote_params.N = 200;
+
+% run learn++.cds. the difference between calling cds or nse is that the
+% you pass the smote structure into the learn_nse.m function.
 [errs_cds, net_cds] = learn_nse(net, data_train, labels_train, data_test, ...
   labels_test, smote_params);
 

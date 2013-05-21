@@ -1,15 +1,13 @@
-% function test_learn()
+function test_learn()
 % test learn++
-clc;
-clear;
-close all;
 K = 5;
 
-addpath('../src/');
-load ionosphere
-u = unique(Y);
+addpath('../src/');   % add the code path 
+load ionosphere       % load the built in ionosphere data set
+u = unique(Y);        % get the number of unique classes
 labels = zeros(numel(Y), 1);
 
+% convert the string labels to numeric labels
 for n = 1:numel(Y)
   for c = 1:numel(u)
     if u{c} == Y{n}
@@ -19,6 +17,7 @@ for n = 1:numel(Y)
   end
 end
 
+% shuffle the data
 i = randperm(numel(Y));
 data = X(i, : );
 labels = labels(i);
