@@ -1,25 +1,38 @@
 function [net,errs] = learn(net, data_train, labels_train, data_test, labels_test)
 % learn++
 
-net.base_classifier = 'CART';
-net.iterations = 10;
+%     learn.m
+%     Copyright (C) 2013 Gregory Ditzler
+% 
+%     This program is free software: you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation, either version 3 of the License, or
+%     (at your option) any later version.
+% 
+%     This program is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warranty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+% 
+%     You should have received a copy of the GNU General Public License
+%     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 Tk = net.iterations;
 K = length(data_train);
 net.classifiers = cell(Tk*K, 1); 
 net.beta = zeros(Tk*K, 1); 
 
-c_count = 1;
+c_count = 0;
 errs = zeros(Tk*K, 1);
 
 
-for k = 1:K
+for k = 1:K  
   data_train_k = data_train{k};
   labels_train_k = labels_train{k};
+  D = ones(numel(labels_train_k), 1)/numel(labels_train_k);
   
-  if k == 1
-    D = ones(numel(labels_train_k), 1)/numel(labels_train_k);
-  else
+  if k > 1
     predictions = classify_ensemble(net, data_train_k, labels_train_k, ...
       c_count);
     epsilon_kt = sum(D(predictions ~= labels_train_k));
@@ -28,6 +41,8 @@ for k = 1:K
   end
   
   for t = 1:Tk
+    c_count = c_count + 1;
+    
     % step 1
     D = D / sum(D);
     
@@ -64,9 +79,7 @@ for k = 1:K
     % make some predictions 
     [predictions,posterior] = classify_ensemble(net, data_test, ...
       labels_test, c_count);
-    errs(c_count) = sum(predictions ~= labels_test)/numel(labels_test);
-    
-    c_count = c_count + 1; 
+    errs(c_count) = sum(predictions ~= labels_test)/numel(labels_test); 
   end
   
   
