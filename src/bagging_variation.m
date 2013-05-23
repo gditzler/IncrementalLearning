@@ -48,7 +48,7 @@ sub_ensemble = cell(n_classifiers, 1);
 
 for k = 1:n_classifiers
   index = negative_indices(randi(numel(negative_indices), 1, ...
-    floor(numel(negative_indices)/n_classifiers)));
+    floor(numel(labels)/n_classifiers)));
   data_k = [data(index, :); data(positive_indices, :)];
   label_k = [labels(index); labels(positive_indices)];
   sub_ensemble{k} = classifier_train(base_classifier, data_k, label_k);
