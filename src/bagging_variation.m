@@ -46,7 +46,7 @@ negative_indices = find(labels ~= minority_class);
 positive_indices = find(labels == minority_class);
 sub_ensemble = cell(n_classifiers, 1);
 
-for k = 1:n_classifiers
+parfor k = 1:n_classifiers
   index = negative_indices(randi(numel(negative_indices), 1, ...
     floor(numel(labels)/n_classifiers)));
   data_k = [data(index, :); data(positive_indices, :)];

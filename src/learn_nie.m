@@ -4,6 +4,9 @@ function [net,f_measure,g_mean,recall,precision,err] = learn_nie(net, data_train
 disp('I just wrote this up. I have not fully tested it. So')
 disp('use it at your own risk. Let me know of you catch any')
 disp('errors.      -Gregory')
+disp(' ')
+disp('Use open a matlabpool for parallel processing. Should')
+disp('speed up the runtime quite a bit. ')
 
 
 n_timestamps = length(data_train);  % total number of time stamps
@@ -124,12 +127,15 @@ function predictions = subensemble_test(classifiers, data, mclass)
 n_experts = length(classifiers);        % how many classifiers 
 weights = ones(n_experts, 1)/n_experts; % uniform weights
 p = zeros(size(data,1), mclass);
+y = zeros(size(data,1), n_experts);
+
+parfor k = 1:n_experts
+  y(:,k) = classifier_test(classifiers{k}, data);  
+end
+
 for k = 1:n_experts
-  y = classifier_test(classifiers{k}, data);
-  
-  % this is inefficient, but it does the job 
   for m = 1:numel(y)
-    p(m,y(m)) = p(m,y(m)) + weights(k);
+    p(m,y(m,k)) = p(m,y(m,k)) + weights(k);
   end
 end
 [~,predictions] = max(p');
