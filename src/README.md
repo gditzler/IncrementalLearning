@@ -7,11 +7,14 @@ I am planning on providing some implementations of the Learn++ algorithm in Matl
 
 About the functions 
 ===================
+* `bagging_variation.m` - implementation of the bagging variation algorithm used in Learn++.NIE
 * `classifier_train.m` - implementation of a generic build of a classifier. Refer to the documentation on how to call this function, but in summary you pass it a structure indicating some information about the classifier you would like to create (e.g., CART with some pruning options), and the training data + labels. The result is a new structure containing information about the classifier and the classifier is saved as one of the fields. 
 * `classifier_test.m` - test a classifier that was trained using classifier_train.m. Refer to the documentation on how to call this function.
 * `learn.m` - implementation of the original Learn++ algorithm. The base classifier is controlled using `classifier_train.m` and `classifier_test.m`. Refer to the documentation on how to call this function.
-* `learn_nse.m` - implementation of the original Learn++ algorithm. The base classifier is controlled using `classifier_train.m` and `classifier_test.m`. Refer to the documentation on how to call this function.
+* `learn_nse.m` - implementation of the original Learn++.NSE algorithm. The base classifier is controlled using `classifier_train.m` and `classifier_test.m`. Refer to the documentation on how to call this function.
+* `learn_nie.m` - implementation of the original Learn++.NIE algorithm. The base classifier is controlled using `classifier_train.m` and `classifier_test.m`. Refer to the documentation on how to call this function.
 * `smote.m` - synthetic minority oversampling technique. Refer to the documentation on how to call this function.
+# `stats.m` - compute the statistics of a classification result. current method implements [F-measure](http://en.wikipedia.org/wiki/F1_score), [Precision](http://en.wikipedia.org/wiki/Precision_(information_retrieval)), [Recall](http://en.wikipedia.org/wiki/Recall_(information_retrieval)), [G-mean](http://en.wikipedia.org/wiki/Geometric_mean), and 1-0 error.
 
 
 References 
