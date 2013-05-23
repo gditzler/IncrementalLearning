@@ -1,13 +1,5 @@
 function [net,f_measure,g_mean,recall,precision,err] = learn_nie(net, data_train, labels_train, data_test, labels_test)
 % implement learn++.nie
-% net.method = 'wavg';% wavg, fm, gm
-% net.n_classifiers = 5;
-% net.minority_class = 2;
-% net.base_classifier = 'CART';
-%net.a = .5;
-%net.b = 10;
-%net.mclass = 2; 
-%net.cvx_parameter = .5*ones(2,1);
 
 disp('I just wrote this up. I have not fully tested it. So')
 disp('use it at your own risk. Let me know of you catch any')
@@ -20,11 +12,16 @@ net.w = [];             % weights
 net.initialized = false;% set to false
 net.t = 1;              % track the time of learning
 net.classifierweigths = {};      % array of classifier weights
-errs = zeros(n_timestamps, 1);
 net.type = 'learn++.nie';
 
+f_measure = zeros(n_timestamps, net.mclass);
+g_mean = zeros(n_timestamps, 1);
+recall = zeros(n_timestamps, net.mclass);
+precision = zeros(n_timestamps, net.mclass);
+err = zeros(n_timestamps, 1);
+
+
 for ell = 1:n_timestamps
-  disp(net.t)
   
   % get the training data for the 't'th round 
   data_train_t = data_train{ell};
@@ -51,29 +48,28 @@ for ell = 1:n_timestamps
 
   for k = 1:net.t
     
-    if strcmp(net.method, 'wavg')
-      [~,~,recl] = stats(labels_train_t, y(:, k), net.mclass);
-      epsilon_tk = sum(net.cvx_parameter.*(1 - recl));
-    elseif strcmp(net.method, 'fm')
-      fm = stats(labels_train_t, y(:, k), net.mclass);
-      epsilon_tk = 1 - fm(net.minority_class);
-    elseif strcmp(net.method, 'gm')
-      [~,gm] = stats(labels_train_t, y(:, k), net.mclass);
-      epsilon_tk = 1 - gm;
-    else
-      error('LEARN_NIE :: Unknown weighting method!')
+    epsilon_tk = return_espilon_kt(net, labels_train_t, y(:, k));
+    if k == net.t
+      disp([epsilon_tk,net.t])
     end
     
     if (k<net.t)&&(epsilon_tk>0.5) 
       epsilon_tk = 0.5;
     elseif (k==net.t)&&(epsilon_tk>0.5)
       % try generate a new classifier 
-      net.classifiers{k} = classifier_train(...
-        net.base_classifier, ...  
+      net.classifiers{k} = bagging_variation(...
         data_train_t, ...
-        labels_train_t);
-      epsilon_tk  = sum(Dt(y(:, k) ~= labels_train_t));
-      epsilon_tk(epsilon_tk > 0.5) = 0.5;   % we tried; clip the loss 
+        labels_train_t, ...
+        net.n_classifiers, ...
+        net.minority_class, ...
+        net.base_classifier);
+      epsilon_tk = return_espilon_kt(net, ...
+        labels_train_t, ...
+        subensemble_test(net.classifiers{k}, ...
+          data_train_t, ...
+          net.mclass) ...
+        );
+      epsilon_tk(epsilon_tk > 0.5) = 0.5;
     end
     net.beta(net.t,k) = epsilon_tk / (1-epsilon_tk);
   end
@@ -103,7 +99,6 @@ for ell = 1:n_timestamps
   
   
   [predictions,posterior] = classify_ensemble(net, data_test_t, labels_test_t);
-  %errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
   [f_measure(ell,:),g_mean(ell),recall(ell,:),precision(ell,:),...
     err(ell)] = stats(labels_test_t, predictions, net.mclass);
 
@@ -111,7 +106,6 @@ for ell = 1:n_timestamps
   net.t = net.t + 1;
 
 end
-
 
 
 
@@ -160,3 +154,18 @@ end
 [~,predictions] = max(p');
 predictions = predictions';
 posterior = p./repmat(sum(p,2),1,net.mclass);
+
+
+function epsilon_tk = return_espilon_kt(net, labels, y)
+if strcmp(net.method, 'wavg')
+  [~,~,recl] = stats(labels, y, net.mclass);
+  epsilon_tk = sum(net.cvx_parameter.*(1 - recl));
+elseif strcmp(net.method, 'fm')
+  fm = stats(labels, y, net.mclass);
+  epsilon_tk = 1 - fm(net.minority_class);
+elseif strcmp(net.method, 'gm')
+  [~,gm] = stats(labels, y, net.mclass);
+  epsilon_tk = 1 - gm;
+else
+  error('LEARN_NIE :: Unknown weighting method!')
+end

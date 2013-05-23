@@ -17,7 +17,7 @@ net.mclass = 2;               % number of classes in the prediciton problem
 net.base_classifier = model;  % set the base classifier in the net struct
 net.minority_class = 2;
 net.cvx_parameter = .5*ones(1,2);
-net.method = 'wavg';% wavg, fm, gm
+net.method = 'fm';% wavg, fm, gm
 net.n_classifiers = 5;
 net.minority_class = 2;
 
@@ -55,4 +55,5 @@ for t = 1:T
   labels_test{t} = l;
 end
 
-[net,f_measure,g_mean,recall,precision,err] = learn_nie(net, data_train, labels_train, data_test, labels_test)
+[net,f_measure,g_mean,recall,precision,err] = learn_nie(net, ...
+  data_train, labels_train, data_test, labels_test);
