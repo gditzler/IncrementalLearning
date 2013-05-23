@@ -1,13 +1,13 @@
-function learn_nie(net, data_train, labels_train, data_test, labels_test)
+function [net,f_measure,g_mean,recall,precision,err] = learn_nie(net, data_train, labels_train, data_test, labels_test)
 % implement learn++.nie
-net.method = 'wavg';% wavg, fm, gm
-net.n_classifiers = 5;
-net.minority_class = 2;
-net.base_classifier = 'CART';
-net.a = .5;
-net.b = 10;
-net.mclass = 2; 
-net.cvx_parameter = .5;
+% net.method = 'wavg';% wavg, fm, gm
+% net.n_classifiers = 5;
+% net.minority_class = 2;
+% net.base_classifier = 'CART';
+%net.a = .5;
+%net.b = 10;
+%net.mclass = 2; 
+%net.cvx_parameter = .5*ones(2,1);
 
 disp('I just wrote this up. I have not fully tested it. So')
 disp('use it at your own risk. Let me know of you catch any')
@@ -24,6 +24,7 @@ errs = zeros(n_timestamps, 1);
 net.type = 'learn++.nie';
 
 for ell = 1:n_timestamps
+  disp(net.t)
   
   % get the training data for the 't'th round 
   data_train_t = data_train{ell};
@@ -51,14 +52,14 @@ for ell = 1:n_timestamps
   for k = 1:net.t
     
     if strcmp(net.method, 'wavg')
-      [~,~,~,~,err] = stats(labels_train_t, y(:, k));
-      epsilon_tk = sum(net.cvx_parameter.*err);
+      [~,~,recl] = stats(labels_train_t, y(:, k), net.mclass);
+      epsilon_tk = sum(net.cvx_parameter.*(1 - recl));
     elseif strcmp(net.method, 'fm')
-      f_measure = stats(labels_train_t, y(:, k));
-      epsilon_tk = 1 - f_measure(net.minority_class);
+      fm = stats(labels_train_t, y(:, k), net.mclass);
+      epsilon_tk = 1 - fm(net.minority_class);
     elseif strcmp(net.method, 'gm')
-      [~,g_mean] = stats(labels_train_t, y(:, k));
-      epsilon_tk = 1 - g_mean;
+      [~,gm] = stats(labels_train_t, y(:, k), net.mclass);
+      epsilon_tk = 1 - gm;
     else
       error('LEARN_NIE :: Unknown weighting method!')
     end
@@ -102,8 +103,10 @@ for ell = 1:n_timestamps
   
   
   [predictions,posterior] = classify_ensemble(net, data_test_t, labels_test_t);
-  errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
-  
+  %errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
+  [f_measure(ell,:),g_mean(ell),recall(ell,:),precision(ell,:),...
+    err(ell)] = stats(labels_test_t, predictions, net.mclass);
+
   net.initialized = 1;
   net.t = net.t + 1;
 
@@ -117,8 +120,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% AUXILARY FUNCTIONS
 function y = decision_ensemble(net, data, labels, t)
-y = zeros(numel(labels), n_experts);
-for k = 1:n_experts
+y = zeros(numel(labels), t);
+for k = 1:t
   y(:, k) = subensemble_test(net.classifiers{k}, data, net.mclass);
 end
 
@@ -126,7 +129,7 @@ end
 function predictions = subensemble_test(classifiers, data, mclass)
 n_experts = length(classifiers);        % how many classifiers 
 weights = ones(n_experts, 1)/n_experts; % uniform weights
-p = zeros(numel(labels), mclass);
+p = zeros(size(data,1), mclass);
 for k = 1:n_experts
   y = classifier_test(classifiers{k}, data);
   
@@ -139,7 +142,7 @@ end
 predictions = predictions';
 
 
-function classify_ensemble(net, data, labels)
+function [predictions,posterior] = classify_ensemble(net, data, labels)
 n_experts = length(net.classifiers);
 weights = net.w(end,:);
 if n_experts ~= length(weights)
