@@ -8,7 +8,6 @@ disp('file can be found: https://github.com/gditzler/ConceptDriftData ');
 addpath('../src/');
 
 
-
 model.type = 'CART';          % base classifier
 net.a = .5;                   % slope parameter to a sigmoid
 net.b = 10;                   % cutoff parameter to a sigmoid
@@ -25,7 +24,7 @@ net.minority_class = 2;
 
 % generate the sea data set
 T = 200;  % number of time stamps
-N = 100;  % number of data points at each time
+N = 1000;  % number of data points at each time
 ds = .5;
 [data_train, labels_train,data_test,labels_test] = ConceptDriftData('sea', T, N);
 for t = 1:T
@@ -57,3 +56,4 @@ end
 
 [net,f_measure,g_mean,recall,precision,err] = learn_nie(net, ...
   data_train, labels_train, data_test, labels_test);
+plot(f_measure(:,2))
