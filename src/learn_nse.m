@@ -58,12 +58,6 @@ function [errs, net] = learn_nse(net, data_train, labels_train, data_test, ...
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
-disp('I just wrote this up. I have not fully tested it. So')
-disp('use it at your own risk. Let me know of you catch any')
-disp('errors.      -Gregory')
-
-
 if nargin < 5
   error('LEARN_NSE :: You need to specify all the required inputs. ')
 end
