@@ -32,7 +32,7 @@ function [data_train,data_test,labels_train,labels_test] = test_then_train(data,
 % 
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-n_observations = len(labels);
+n_observations = length(labels);
 n = 0;
 kill_loop = false;
 data_train = {};
@@ -42,12 +42,12 @@ labels_test = {};
 
 while true
   te_idx = (n+1)*win_size+1:(n+2)*win_size;
-  tr_idx = n*win_size:(n+1)*win_size;
+  tr_idx = n*win_size+1:(n+1)*win_size;
   n = n + 1;
   if max(te_idx) > n_observations
     te_idx = te_idx(te_idx <= n_observations);
     kill_loop = true;
-  end
+  end 
   
   data_train{n} = data(tr_idx, :);
   data_test{n} = data(te_idx, :);
