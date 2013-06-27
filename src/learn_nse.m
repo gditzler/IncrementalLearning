@@ -1,6 +1,6 @@
-function [errs, net] = learn_nse(net, data_train, labels_train, data_test, ...
+function [net,f_measure,g_mean,precision,recall,err] = learn_nse(net, data_train, labels_train, data_test, ...
   labels_test, smote_params)
-%    [errs, net] = learn_nse(net, ...
+%    [net,f_measure,g_mean,precision,recall,err] = learn_nse(net, ...
 %        data_train, labels_train, ...
 %        data_test, labels_test, ...
 %        smote_params)
@@ -77,7 +77,13 @@ net.w = [];             % weights
 net.initialized = false;% set to false
 net.t = 1;              % track the time of learning
 net.classifierweigths = {};               % array of classifier weights
-errs = zeros(n_timestamps, 1);
+
+f_measure = zeros(n_timestamps, net.mclass);
+g_mean = zeros(n_timestamps, 1);
+recall = zeros(n_timestamps, net.mclass);
+precision = zeros(n_timestamps, net.mclass);
+err = zeros(n_timestamps, 1);
+
 
 for ell = 1:n_timestamps
   
@@ -173,7 +179,10 @@ for ell = 1:n_timestamps
   
   
   [predictions,posterior] = classify_ensemble(net, data_test_t, labels_test_t);
-  errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
+  %errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
+  
+  [f_measure(ell,:),g_mean(ell),recall(ell,:),precision(ell,:),...
+    err(ell)] = stats(labels_test_t, predictions, net.mclass);
   
   net.initialized = 1;
   net.t = net.t + 1;
