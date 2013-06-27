@@ -53,7 +53,7 @@ while true
   data_test{n} = data(te_idx, :);
   labels_train{n} = labels(tr_idx);
   labels_test{n} = labels(te_idx);
-  
+
   if kill_loop == true
     break;
   end
