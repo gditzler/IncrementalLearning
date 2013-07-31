@@ -29,7 +29,7 @@ for t = 1:T
 end
 
 % run learn++.nse
-[errs_nse, net_nse] = learn_nse(net, data_train, labels_train, data_test, ...
+[~,~,~,~,~,errs_nse] = learn_nse(net, data_train, labels_train, data_test, ...
    labels_test);
 
 % reset the parameters of the net struct. 
@@ -47,7 +47,7 @@ smote_params.N = 200;
 
 % run learn++.cds. the difference between calling cds or nse is that the
 % you pass the smote structure into the learn_nse.m function.
-[errs_cds, net_cds] = learn_nse(net, data_train, labels_train, data_test, ...
+[~,~,~,~,~,errs_cds] = learn_nse(net, data_train, labels_train, data_test, ...
   labels_test, smote_params);
 
 figure;
