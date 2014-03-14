@@ -14,5 +14,5 @@ References
 ===================
 1. R. Polikar, L. Udpa, S. Udpa, and V. Honavar, "Learn++: An incremental learning algorithm for supervised neural networks," IEEE Transactions on System, Man and Cybernetics (C), Special Issue on Knowledge Management, vol. 31, no. 4, pp. 497-508, 2001.
 2. R. Elwell and R. Polikar, "Incremental Learning of Concept Drift in Nonstationary Environments" IEEE Transactions on Neural Networks, vol. 22, no. 10, pp. 1517-1531
-3. G. Ditzler and R. Polikar, "Incremental learning of concept drift from streaming imbalanced data," in IEEE Transactions on Knowledge & Data Engineering, 2012, accepted.
+3. G. Ditzler and R. Polikar, "Incremental learning of concept drift from streaming imbalanced data," in IEEE Transactions on Knowledge & Data Engineering, 2013, vol. 25, no. 10, pp. 2283-2301. 
 4. N. V. Chawla, K. W. Bowyer, T. E. Moore and P. Kegelmeyer, "SMOTE: Synthetic Minority Over-Sampling Technique," Journal of Artificial Intelligence Research, 16, 321-357, 2002.
